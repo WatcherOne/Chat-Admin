@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>socket</title>
+</head>
+<body>
+    <div class="container">
+        <div id="message-list" class="message-list">
+            <div class="each-message">
+
+            </div>
+        </div>
+        <input type="text" id="input">
+        <button type="button" id="submit">提交</button>
+    </div>
+</body>
+<script src="./socket.min.js"></script>
+<script>
+    const socket = io('ws://localhost:5000')
+
+    let userId = ''
+    const $input = document.getElementById('input')
+    const $submit = document.getElementById('submit')
+
+    $submit.addEventListener('click', e => {
+        e.preventDefault()
+        const value = $input.value
+        if (value) {
+            sendMessage(value)
+        }
+    })
+
+    function sendMessage (message) {
+        socket.emit('chat message', message, {
+            name: 'name1'
+        })
+    }
+
+    socket.on('chat message', msg => {
+        console.log('接收消息: ', msg)
+    })
+
+    socket.on('start', id => {
+        userId = id
+    })
+
+    socket.on('new-user', id => {
+        console.log('新用户来了:', id)
+    })
+
+    socket.on('leave-user', id => {
+        console.log('用户离开了:', id)
+    })
+</script>
+</html>

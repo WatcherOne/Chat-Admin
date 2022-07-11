@@ -1,0 +1,27 @@
+{
+  "name": "socket",
+  "version": "1.0.0",
+  "description": "chat tool",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WatcherOne/Socket.git"
+  },
+  "keywords": [
+    "node",
+    "socket"
+  ],
+  "author": "zhubo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/WatcherOne/Socket/issues"
+  },
+  "homepage": "https://github.com/WatcherOne/Socket#readme",
+  "dependencies": {
+    "socket.io": "^4.5.1"
+  }
+}
