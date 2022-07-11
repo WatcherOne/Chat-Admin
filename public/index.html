@@ -8,20 +8,94 @@
 </head>
 <body>
     <div class="container">
-        <div id="message-list" class="message-list">
-            <div class="each-message">
-
-            </div>
+        <div class="login-container">
+            <input type="text" id="username">
+            <button type="button" onclick="login()">登陆</button>
         </div>
+        <div class="user-info">
+            <span>当前登陆者</span>
+            <span id="user-name"></span>
+        </div>
+        <div id="user-list" class="user-list"></div>
+        <div id="message-list" class="message-list"></div>
         <input type="text" id="input">
         <button type="button" id="submit">提交</button>
     </div>
 </body>
 <script src="./socket.min.js"></script>
 <script>
-    const socket = io('ws://localhost:5000')
+    const socket = io()
 
-    let userId = ''
+    // const userInfoStr = localStorage.getItem('s-user-info')
+    // const userInfo = userInfoStr ? JSON.parse(userInfoStr) : null
+    let userInfo = null
+    if (userInfo) {
+        // 隐藏登陆界面
+        const { id, userName } = userInfo
+        socket.emit('login', userName)
+        document.getElementById('user-name').innerText = userName
+    } else {
+        // 显示登录页面
+
+    }
+
+    // 登录成功的回调
+    socket.on('loginSuccess', (userList, currentUser) => {
+        userInfo = currentUser
+        showUserList(userList)
+        const { userName } = currentUser
+        // localStorage.setItem('s-user-info', JSON.stringify(currentUser))
+        document.getElementById('user-name').innerText = userName
+        // 隐藏登陆页面
+    })
+    
+    socket.on('join-user', (userList, currentUser) => {
+        showUserList(userList)
+        console.log('用户上线：', currentUser.userName)
+    })
+    socket.on('leave-user', (userList, currentUser) => {
+        showUserList(userList)
+        console.log('用户下线：', currentUser.userName)
+    })
+
+    const $userList = document.getElementById('user-list')
+    function showUserList (userList) {
+        $userList.innerHTML = handleUserList(userList)
+    }
+
+    function handleUserList (userList) {
+        let result = ''
+        userList.forEach(item => {
+            const curretUserId = userInfo ? userInfo.id : 0
+            const { id, userName } = item
+            result += (curretUserId !== id) ? `<div data-id="${id}">${userName}</div>` : ''
+        })
+        return result
+    }
+
+    socket.on('chat', desc => {
+        showMessageList(desc)
+        console.log('接收到的消息: ', desc)
+    })
+
+    const $messageList = document.getElementById('message-list')
+    function showMessageList (desc) {
+        const { userName, time, message } = desc
+        $messageList.appendChild(appendHtml(`<div class="each-message">${userName}: ${message}</div>`))
+    }
+
+    function appendHtml (html) {
+        const divTemp = document.createElement("div")
+        let nodes = null
+        const fragment = document.createDocumentFragment()
+        divTemp.innerHTML = html
+        nodes = divTemp.childNodes
+        for (let i = 0, length = nodes.length; i < length; i++) {
+            fragment.appendChild(nodes[i].cloneNode(true))
+        }
+        return fragment
+    }
+
     const $input = document.getElementById('input')
     const $submit = document.getElementById('submit')
 
@@ -29,30 +103,17 @@
         e.preventDefault()
         const value = $input.value
         if (value) {
-            sendMessage(value)
+            socket.emit('chat', value)
         }
     })
 
-    function sendMessage (message) {
-        socket.emit('chat message', message, {
-            name: 'name1'
-        })
+    // 登录操作
+    function login () {
+        event.preventDefault()
+        const $input = document.getElementById('username')
+        const username = $input.value
+        if (!username) return
+        socket.emit('login', username)
     }
-
-    socket.on('chat message', msg => {
-        console.log('接收消息: ', msg)
-    })
-
-    socket.on('start', id => {
-        userId = id
-    })
-
-    socket.on('new-user', id => {
-        console.log('新用户来了:', id)
-    })
-
-    socket.on('leave-user', id => {
-        console.log('用户离开了:', id)
-    })
 </script>
 </html>

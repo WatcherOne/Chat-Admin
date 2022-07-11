@@ -11,7 +11,7 @@ const { Server } = require('socket.io')
 
 const app = http.createServer((request, response) => {
     const url = request.url
-    if (url === '/' || url.startsWith('/?')) {
+    if (url === '/' || url === '/index') {
         response.writeHead(200, { 'Content-type': 'text/html' })
         const data = fs.readFileSync('./public/index.html')
         response.end(data)
@@ -31,8 +31,28 @@ const app = http.createServer((request, response) => {
 
 const io = new Server(app)
 
+const userList = []
+
+function addUser (obj) {
+    const { id } = obj
+    const isExist = userList.some(item => item.id === id)
+    if (isExist) return
+    userList.push(obj)
+}
+
+function delUser (id) {
+    const index = userList.findIndex(item => item.id === id)
+    const userArr = index > -1 ? userList.splice(index, 1) : []
+    return userArr[0] || {}
+}
+
+function findUser (id) {
+    return userList.find(item => item.id === id)
+}
+
+let messageList = []
+
 io.on('connection', socket => {
-    console.log(socket.handshake.query.roomId)
     const { id } = socket
     console.log('连接者:', id)
     // 当建立新连接时触发, socket为当前连接的实例
@@ -42,19 +62,31 @@ io.on('connection', socket => {
      */
 
     // 当用户登录后
-    socket.on('login', data => {
-        // 存入用户信息list
+    socket.on('login', userName => {
+        const user = { id, userName }
+        addUser(user)
+        socket.emit('loginSuccess', userList, user)
+        // 当有新用户上线后, 发送通知
+        socket.broadcast.emit('join-user', userList, user)
     })
 
-    // 先发送广播告知自己的ID
-    socket.emit('start', id)
-
-    // 当有新用户连接时, 发送通知
-    socket.broadcast.emit('new-user', id)
-
     socket.on('disconnect', () => {
+        const user = delUser(id)
         // 当有用户离开时, 发送通知
-        socket.broadcast.emit('leave-user', id)
+        socket.broadcast.emit('leave-user', userList, user)
+    })
+
+    // 聊天连接
+    socket.on('chat', msg => {
+        const { userName } = findUser(id) || {}
+        const msgObj = {
+            id,
+            userName,
+            time: new Date().getTime(),
+            message: msg
+        }
+        messageList.push(msgObj)
+        io.emit('chat', msgObj)
     })
 
     // 客户端：io.connect('http://localhost:3000?roomId=2') 房间号
@@ -65,13 +97,6 @@ io.on('connection', socket => {
     // socket.leave(roomId) 离开房间号
     // io.to(roomId).emit('') 给指定房间号所有人广播
     // io.broadcast.to(roomId).emit('') 给指定房间除了自己外的所有人广播
-
-    socket.on('chat message', (msg, from) => {
-        console.log('received: ' + msg)
-        console.log('from:')
-        console.log(from)
-        socket.emit('chat message', msg, from)
-    })
 })
 
 app.listen(5000, () => {
