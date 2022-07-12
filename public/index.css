@@ -63,6 +63,7 @@ body {
     display: flex;
     flex-direction: column;
     background: #F6F6F7;
+    overflow: hidden;
 }
 
 .right-box .top-title {
@@ -81,6 +82,7 @@ body {
     flex: 1;
     display: flex;
     flex-direction: row;
+    overflow: hidden;
 }
 
 .right-box .bottom-content .online-user {
@@ -117,6 +119,7 @@ body {
     flex: 1;
     display: flex;
     flex-direction: column;
+    overflow: hidden;
 }
 
 .chat-room .input-container {
@@ -168,6 +171,7 @@ body {
     display: flex;
     flex-direction: column;
     padding: 15px;
+    overflow: auto;
 }
 
 .chat-room .message-box .tips-message {
