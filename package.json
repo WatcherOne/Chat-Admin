@@ -15,7 +15,19 @@
     "node",
     "socket"
   ],
-  "author": "zhubo",
+  "author": "watcher<286154864@qq.com>(https://github.com/WatcherOne)",
+  "contributors": [
+    {
+      "name": "watcher",
+      "email": "286154864@qq.com",
+      "url": "https://github.com/WatcherOne"
+    },
+    {
+      "name": "songxiaolin",
+      "email": "xxxx@qq.com",
+      "url": "https://github.com"
+    }
+  ],
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/WatcherOne/Socket/issues"
