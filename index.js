@@ -9,7 +9,7 @@ const fs = require('fs')
 const http = require('http')
 // 其实就是 websocket 的封装
 const { Server } = require('socket.io')
-const { userList, addUser, delUser, findUser } = require('./users')
+const { Cluster } = require('./cluster')
 
 // 后续用 koa 来改进
 const app = http.createServer((request, response) => {
@@ -43,7 +43,7 @@ const app = http.createServer((request, response) => {
 
 const io = new Server(app)
 
-let userFlag = 0
+const cluster = new Cluster()
 let messageList = []
 
 io.on('connection', socket => {
@@ -53,23 +53,32 @@ io.on('connection', socket => {
 
     // 当用户登录进来后
     socket.on('login', userInfo => {
-        const newUser = Object.assign({}, userInfo, { id, userId: ++userFlag })
-        addUser(newUser)
-        console.log('有用户进入：', userList)
+        const newUser = cluster.addUser(Object.assign({}, userInfo, { id }))
         // 给自己发, 返回当前用户绑定的相关信息
-        socket.emit('loginSuccess', userList, newUser)
+        socket.emit('loginSuccess', cluster.userList, newUser, messageList)
         // 给除自己之外的人发, 当有新用户上线后, 发送通知
-        socket.broadcast.emit('join-user', userList, newUser)
+        socket.broadcast.emit('join-user', cluster.userList, Object.assign({}, newUser, {
+            type: 1,
+            time: new Date().getTime()
+        }))
     })
     socket.on('disconnect', () => {
-        const user = delUser(id)
-        // 当有用户离开时, 发送通知
-        socket.broadcast.emit('leave-user', userList, user)
+        const user = cluster.findUserById(id)
+        // 只有登录过的用户才能删除用户
+        if (user) {
+            cluster.delUser(user.userId)
+            // 当有用户离开时, 发送通知
+            socket.broadcast.emit('leave-user', cluster.userList, Object.assign({}, user, {
+                type: 2,
+                time: new Date().getTime()
+            }))
+        }
     })
     // 聊天连接
     socket.on('chat', msg => {
-        const userObj = findUser(id) || {}
-        const params = Object.assign({}, userObj, {
+        const user = cluster.findUserById(id) || {}
+        const params = Object.assign({}, user, {
+            type: 0,
             time: new Date().getTime(),
             message: msg
         })

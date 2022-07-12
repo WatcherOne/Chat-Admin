@@ -18,21 +18,22 @@ window.onload = () => {
 
     socket.emit('login', userInfo)
     // 连接socket成功后的回调
-    socket.on('loginSuccess', (userList, currentUser) => {
+    socket.on('loginSuccess', (userList, currentUser, messageList) => {
         userInfo = currentUser
-        showUserList(userList)
         showUserInfo()
+        showUserList(userList)
+        // showMessageList(messageList)
         sessionStorage.setItem('z-user-info', JSON.stringify(currentUser))
     })
     // 有新用户上线给出提示
-    socket.on('join-user', (userList, newUser) => {
+    socket.on('join-user', (userList, userOnlineMsg) => {
         showUserList(userList)
-        showJoinUser(newUser)
+        showMessageList(userOnlineMsg)
     })
     // 当有用户下线给出提示
-    socket.on('leave-user', (userList, leaveUser) => {
+    socket.on('leave-user', (userList, userLeaveMsg) => {
         showUserList(userList)
-        showJoinUser(leaveUser)
+        showMessageList(userLeaveMsg)
     })
     // 聊天
     socket.on('chat', desc => {
@@ -60,11 +61,17 @@ window.onload = () => {
         $input.value = ''
     }
 
-    // 展示消息框
+    /**
+     *  展示消息框
+     *  type: 0 消息类数据
+     *  type: 1 用户上线信息
+     *  type: 2 用户下线信息 
+     */
     function showMessageList (desc) {
-        const { userId, userName, avatar, message } = desc
+        const { type = 0, userId, userName, avatar, message } = desc
         const self = userInfo.userId === userId
-        $messageList.appendChild(appendHtml(`<div class="each-message ${self ? 'self-message' : ''}">
+        type === 0
+        ? $messageList.appendChild(appendHtml(`<div class="each-message ${self ? 'self-message' : ''}">
             <div class="msg-avatar">
                 <img src="./images/${avatar || 'avatar1.png'}" />
             </div>
@@ -72,6 +79,9 @@ window.onload = () => {
                 <div class="author ${self ? 'none' : ''}">${userName}</div>
                 <div class="msg">${message}</div>
             </div>
+        </div>`))
+        : $messageList.appendChild(appendHtml(`<div class="tips-message">
+            用户【${userName}】${type === 1 ? '已上线' : '已下线'}
         </div>`))
     }
 
@@ -101,7 +111,6 @@ window.onload = () => {
 
     function handleUserList (userList) {
         let result = ''
-        console.log(userList)
         userList.forEach(item => {
             const { userId, userName } = item
             result += `<div data-id="${userId}" class="each-user">
@@ -110,10 +119,5 @@ window.onload = () => {
             </div>`
         })
         return result
-    }
-
-    // 提示有用户上线
-    function showJoinUser (user) {
-
     }
 }
