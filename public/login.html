@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聊天室</title>
+    <link rel="stylesheet" href="./login.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-model">
+            <div class="left-box">
+                <div class="en">Welcome to</div>
+                <div class="title">Z b 聊天室</div>
+            </div>
+            <div class="right-box">
+                <div class="label">用户名</div>
+                <div class="content-group">
+                    <input type="text" id="name" class="input-inner">
+                </div>
+                <div class="label">选择头像</div>
+                <div class="content-group">
+                    <div id="avatar-select" class="avatar-list">
+                        <img src="./images/avatar1.png" data-index="1" alt="">
+                        <img src="./images/avatar2.png" data-index="2" alt="">
+                        <img src="./images/avatar3.png" data-index="3" alt="">
+                        <img src="./images/avatar4.png" data-index="4" alt="">
+                        <img src="./images/avatar5.png" data-index="5" alt="">
+                        <img src="./images/avatar6.png" data-index="6" alt="">
+                        <img src="./images/avatar7.png" data-index="7" alt="">
+                        <img src="./images/avatar8.png" data-index="8" alt="">
+                        <img src="./images/avatar9.png" data-index="9" alt="">
+                        <img src="./images/avatar10.png" data-index="10" alt="">
+                        <img src="./images/avatar11.png" data-index="11" alt="">
+                        <img src="./images/avatar12.png" data-index="12" alt="">
+                        <img src="./images/avatar13.png" data-index="13" alt="">
+                        <img src="./images/avatar14.png" data-index="14" alt="">
+                    </div>
+                </div>
+                <div class="bottom-btn">
+                    <button type="button" id="login-submit" class="login-button">登 录</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    window.onload = function () {
+        const userInfo = { userId: 0, userName: '', avatar: '' }
+        const $input = document.getElementById('name')
+        const $avatarList = document.getElementById('avatar-select')
+        const $loginBtn = document.getElementById('login-submit')
+        
+        $input.addEventListener('keyup', event => {
+            if (event.keyCode === 13) {
+                login()
+            }
+            return false
+        })
+        $avatarList.addEventListener('click', selectAvatar)
+        $loginBtn.addEventListener('click', login)
+
+        function selectAvatar () {
+            event.preventDefault()
+            const target = event.target
+            const index = target.dataset.index
+            if (!index) return
+            checkSelected(index)
+            userInfo.avatar = `avatar${index}.png`
+        }
+
+        function checkSelected (index) {
+            const nodeList = $avatarList.querySelectorAll('img')
+            Array.prototype.forEach.call(nodeList, el => {
+                el.classList.remove('selected')
+            })
+            nodeList[index - 1].classList.add('selected')
+        }
+
+        function login () {
+            event.preventDefault()
+            const userName = $input.value
+            if (!userName) {
+                alert('请先输入用户名')
+                return
+            }
+            userInfo.userName = userName
+            sessionStorage.setItem('z-user-info', JSON.stringify(userInfo))
+            window.location.replace('/index')
+        }
+    }
+</script>
+</html>

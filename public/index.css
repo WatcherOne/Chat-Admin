@@ -1,0 +1,236 @@
+html {
+    height: 100%;
+}
+
+body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+.none {
+    display: none;
+}
+
+.index-container {
+    height: 100%;
+    min-height: 600px;
+    position: relative;
+    background: url('./images/loginBg.jpg');
+    background-size: cover;
+    background-attachment: fixed;
+}
+
+.index-container .chat-container {
+    width: 900px;
+    height: 600px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: auto;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    transform: translateY(-5%);
+}
+
+.chat-container .user-info {
+    width: 80px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #4f4d7b;
+    padding: 10px 0;
+    box-sizing: border-box;
+}
+
+.user-info .avatar img {
+    width: 60px;
+    height: 58px;
+    border: 1px solid #cf8a8a;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background: #cf8a8a;
+}
+
+.chat-container .right-box {
+    flex: 1;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    background: #F6F6F7;
+}
+
+.right-box .top-title {
+    width: 100%;
+    height: 50px;
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    border-bottom: 1px solid #E6E7E8;
+    box-sizing: border-box;
+}
+
+.right-box .bottom-content {
+    flex: 1;
+    display: flex;
+    flex-direction: row;
+}
+
+.right-box .bottom-content .online-user {
+    width: 180px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    border-left: 1px solid #E6E7E8;
+    padding: 5px;
+    box-sizing: border-box;
+    overflow: auto;
+}
+
+.online-user .each-user {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.online-user .each-user img {
+    width: 18px;
+    height: 18px;
+}
+
+.online-user .each-user .user-name {
+    margin-left: 5px;
+    font-size: 16px;
+}
+
+.right-box .bottom-content .chat-room {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-room .input-container {
+    height: 180px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    border-top: 1px solid #dedede;
+    background: white;
+}
+
+.input-container .input-box {
+    flex: 1;
+    padding: 10px 5px 5px;
+    box-sizing: border-box;
+}
+
+.input-box .input-inner {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    outline: none;
+    padding: 0;
+    resize: none;
+    /* border: 1px solid #ececec;
+    border-radius: 4px;
+    box-sizing: border-box; */
+}
+
+.input-container .send-btn {
+    width: 120px;
+    height: 30px;
+    align-self: flex-end;
+    margin: 5px 10px 10px;
+    border: 0;
+    border-radius: 4px;
+    outline: none;
+    color: #07C160;
+    background: #E9E9E9;
+    cursor: pointer;
+}
+
+.input-container .send-btn:hover {
+    background: #D7D7D7;
+}
+
+.chat-room .message-box {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+}
+
+.chat-room .message-box .each-message {
+    display: flex;
+    flex-direction: row;
+}
+
+.chat-room .message-box .each-message.self-message {
+    flex-direction: row-reverse;
+}
+
+.each-message .msg-avatar img {
+    width: 34px;
+    height: 34px;
+    border: 1px solid #cf8a8a;
+    border-radius: 5px;
+    box-sizing: border-box;
+    background: #cf8a8a;
+}
+
+.each-message .msg-content {
+    display: flex;
+    flex-direction: column;
+    margin-left: 5px;
+    margin-bottom: 10px;
+}
+
+.each-message.self-message .msg-content {
+    margin-left: 0;
+    margin-right: 5px;
+}
+
+.each-message .msg-content .author {
+    font-size: 14px;
+    color: #B2B2B2;
+}
+
+.each-message .msg-content .msg {
+    line-height: 20px;
+    padding: 7px 10px;
+    border-radius: 5px;
+    color: #222;
+    background: white;
+    position: relative;
+    margin: 5px 0 0 5px;
+}
+
+.each-message.self-message .msg-content .msg {
+    margin: 0 5px 0 0;
+    background: #8AD365;
+}
+
+.each-message .msg-content .msg::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: -5px;
+    border-right: 5px solid white;
+    border-top: 5px solid transparent;
+    border-bottom: 5px solid transparent;
+}
+
+.each-message.self-message .msg-content .msg::before {
+    left: initial;
+    right: -5px;
+    border-right-color: #8AD365;
+    transform: rotateY(180deg);
+}

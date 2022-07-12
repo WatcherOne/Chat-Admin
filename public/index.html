@@ -4,116 +4,39 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>socket</title>
+    <title>在线聊天室</title>
+    <link rel="stylesheet" href="./index.css">
 </head>
 <body>
-    <div class="container">
-        <div class="login-container">
-            <input type="text" id="username">
-            <button type="button" onclick="login()">登陆</button>
+    <div class="index-container">
+        <div class="chat-container">
+            <div class="user-info">
+                <div id="avatar" class="avatar"></div>
+            </div>
+            <div class="right-box">
+                <div class="top-title">
+                    <span>公共聊天室</span>
+                    <span class="user-count">(0)</span>
+                </div>
+                <div class="bottom-content">
+                    <div class="chat-room">
+                        <div class="message-box">
+                            <div id="message-list" class="message-list"></div>
+                        </div>
+                        <div class="input-container">
+                            <div class="tools"></div>
+                            <div class="input-box">
+                                <textarea id="input-msg" placeholder="Ctrl + Enter 换行" class="input-inner"></textarea>
+                            </div>
+                            <button type="button" id="send-msg" class="send-btn">发 送 (Enter) </button>
+                        </div>
+                    </div>
+                    <div class="online-user" id="online-user"></div>
+                </div>
+            </div>
         </div>
-        <div class="user-info">
-            <span>当前登陆者</span>
-            <span id="user-name"></span>
-        </div>
-        <div id="user-list" class="user-list"></div>
-        <div id="message-list" class="message-list"></div>
-        <input type="text" id="input">
-        <button type="button" id="submit">提交</button>
     </div>
 </body>
 <script src="./socket.min.js"></script>
-<script>
-    const socket = io()
-
-    // const userInfoStr = localStorage.getItem('s-user-info')
-    // const userInfo = userInfoStr ? JSON.parse(userInfoStr) : null
-    let userInfo = null
-    if (userInfo) {
-        // 隐藏登陆界面
-        const { id, userName } = userInfo
-        socket.emit('login', userName)
-        document.getElementById('user-name').innerText = userName
-    } else {
-        // 显示登录页面
-
-    }
-
-    // 登录成功的回调
-    socket.on('loginSuccess', (userList, currentUser) => {
-        userInfo = currentUser
-        showUserList(userList)
-        const { userName } = currentUser
-        // localStorage.setItem('s-user-info', JSON.stringify(currentUser))
-        document.getElementById('user-name').innerText = userName
-        // 隐藏登陆页面
-    })
-    
-    socket.on('join-user', (userList, currentUser) => {
-        showUserList(userList)
-        console.log('用户上线：', currentUser.userName)
-    })
-    socket.on('leave-user', (userList, currentUser) => {
-        showUserList(userList)
-        console.log('用户下线：', currentUser.userName)
-    })
-
-    const $userList = document.getElementById('user-list')
-    function showUserList (userList) {
-        $userList.innerHTML = handleUserList(userList)
-    }
-
-    function handleUserList (userList) {
-        let result = ''
-        userList.forEach(item => {
-            const curretUserId = userInfo ? userInfo.id : 0
-            const { id, userName } = item
-            result += (curretUserId !== id) ? `<div data-id="${id}">${userName}</div>` : ''
-        })
-        return result
-    }
-
-    socket.on('chat', desc => {
-        showMessageList(desc)
-        console.log('接收到的消息: ', desc)
-    })
-
-    const $messageList = document.getElementById('message-list')
-    function showMessageList (desc) {
-        const { userName, time, message } = desc
-        $messageList.appendChild(appendHtml(`<div class="each-message">${userName}: ${message}</div>`))
-    }
-
-    function appendHtml (html) {
-        const divTemp = document.createElement("div")
-        let nodes = null
-        const fragment = document.createDocumentFragment()
-        divTemp.innerHTML = html
-        nodes = divTemp.childNodes
-        for (let i = 0, length = nodes.length; i < length; i++) {
-            fragment.appendChild(nodes[i].cloneNode(true))
-        }
-        return fragment
-    }
-
-    const $input = document.getElementById('input')
-    const $submit = document.getElementById('submit')
-
-    $submit.addEventListener('click', e => {
-        e.preventDefault()
-        const value = $input.value
-        if (value) {
-            socket.emit('chat', value)
-        }
-    })
-
-    // 登录操作
-    function login () {
-        event.preventDefault()
-        const $input = document.getElementById('username')
-        const username = $input.value
-        if (!username) return
-        socket.emit('login', username)
-    }
-</script>
+<script src="./index.js"></script>
 </html>
