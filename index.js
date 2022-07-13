@@ -50,6 +50,7 @@ io.on('connection', socket => {
     // 当建立新连接时触发, socket为当前连接的实例
     const { id } = socket
     console.log('连接者:', id)
+    // socket.handshake.remoteAddress - 拿不到客户端IP
 
     // 当用户登录进来后
     socket.on('login', userInfo => {

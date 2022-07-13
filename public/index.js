@@ -6,7 +6,11 @@ window.onload = () => {
     }
     
     // socket连接
-    const socket = io()
+    const socket = io({
+        extraHeaders: {
+            'x-real-ip': '192'
+        }
+    })
 
     // 相关DOM
     const $userAvatar = document.getElementById('avatar')
@@ -15,6 +19,7 @@ window.onload = () => {
     const $messageList = document.getElementById('message-list')
     const $input = document.getElementById('input-msg')
     const $submit = document.getElementById('send-msg')
+    let inputIME = false  // 表明输入框正在输入中文
 
     socket.emit('login', userInfo)
     // 连接socket成功后的回调
@@ -42,14 +47,31 @@ window.onload = () => {
 
     $input.addEventListener('keydown', e => {
         const { key, ctrlKey } = e
-        if (key === 'Enter' && ctrlKey) {
+        // Todo：设置某个默认快捷键出来表情选择
+        // Todo: '@' 弹出@某个人
+        if (key === 'Tab') {
+            e.preventDefault()
+        } else if (key === 'Enter' && ctrlKey) {
+            e.preventDefault()
             const newText = `${$input.value}\n`
             $input.value = newText
-        } else if (key === 'Enter') {
+        } else if (key === 'Enter' && !inputIME) {
             sendMsg()
+            // 防止自动换行
             e.preventDefault()
-            return false
         }
+    })
+    // 粘贴事件 Todo
+    $input.addEventListener('paste', e => {
+        const { items, types } = e.clipboardData || e.originalEvent.clipboardData
+        console.log(items, types)
+        return null
+    })
+    $input.addEventListener('compositionStart', () => {
+        inputIME = true
+    })
+    $input.addEventListener('compositionEnd', () => {
+        inputIME = false
     })
     $submit.addEventListener('click', sendMsg)
 
