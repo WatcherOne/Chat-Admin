@@ -1,2 +1,2 @@
-# Socket
-a platform for node socket
+# Chat Admin
+The project is node serve
