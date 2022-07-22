@@ -34,6 +34,10 @@ class UserDao {
         const sql = `select * from user where userName='${userName}' ${filter}`
         return SQL(sql)
     }
+
+    async findUserById(userId) {
+        return SQL(`select * from user where userId=${userId}`)
+    }
 }
 
 const handleQuery = (query) => {

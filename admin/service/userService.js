@@ -26,7 +26,7 @@ class UserService {
         if (result.sqlMessage) {
             return AjaxResult.error(result.sqlMessage)
         }
-        return AjaxResult.success(result.insertId)
+        return AjaxResult.success(result.insertId, '注册成功')
     }
 
     async updateUser(userModel) {

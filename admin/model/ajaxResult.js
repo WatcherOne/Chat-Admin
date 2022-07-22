@@ -29,7 +29,7 @@ class AjaxResult {
 
     set401() {
         this.status = 401
-        this.msg = '用户未登录'
+        this.msg = 'token已过期'
         return this
     }
 
