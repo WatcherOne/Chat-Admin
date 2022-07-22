@@ -1,69 +1,52 @@
 /*************************************************************
  * Author: zhubo
  * Emails: <286154864@qq.com>
- * CreateTime: 2022-07-22 10:52:00
- * Description: 参数的模拟 与 准确搜索 与 排序
+ * CreateTime: 2022-07-22 14:38:15
+ * Description: 用户实体类
 *************************************************************/
-import connection from '../../utils/mysql.js'
 
-const query = (sql, values) => {
-    const conn = connection()
-    return new Promise((resolve) => {
-        conn.query(sql, values, (error, results) => {
-            resolve(error || results)
-        })
-    })
-}
+class User {
+    
+    // 用户ID（唯一标识）
+    userId = null
 
-const insert = (body = {}) => {
-    const sql = `insert into user set ?`
-    return query(sql, Object.assign({ userId: 0 }, body))
-}
+    // 用户账号
+    userName = null
 
-const update = (body = {}) => {
-    const { userId, ...otherObj } = body
-    const sql = `update user set ? where userId = ${userId}`
-    return query(sql, otherObj)
-}
+    // 用户密码
+    password = null
 
-const deleteOne = (userIds) => {
-    const sql = `delete from user where userId in (${userIds})`
-    return query(sql)
-}
+    // 用户昵称
+    nickName = null
 
-const getList = (params = {}) => {
-    const { keys, values } = handleParams(params)
-    const sqlStart = `select * from user${values.length ? ' where ' : ''}`
-    const sqlEnd = keys.length ? keys.join(' and ') : ''
-    return query(`${sqlStart}${sqlEnd}`, values)
-}
+    // 用户头像
+    avatar = null
 
-const findUserByName = (name) => {
-    const sql = `select * from user where userName='${name}'`
-    return query(sql)
-}
+    // 用户性别
+    // 0: 女  1: 男
+    gender = 0
 
-const handleParams = (params) => {
-    const keys = []
-    const values = []
-    for (let [key, value] of Object.entries(params)) {
-        if (value) {
-            if (key === 'userName' || key === 'nickName') {
-                keys.push(`${key} like ?`)
-                values.push(`%${value}%`)
-            } else {
-                keys.push(`${key}=?`)
-                values.push(value)
-            }
-        }
+    constructor(options) {
+        const {
+            userId = 0,
+            userName = null,
+            password = null,
+            nickName = null,
+            avatar = null,
+            gender = null
+        } = options
+        this.userId = userId || 0
+        this.userName = userName
+        this.password = password
+        this.nickName = nickName
+        this.avatar = avatar
+        this.gender = gender
     }
-    return { keys, values }
+
+    formatGender(gender = this.gender) {
+        const genderInt = isNaN(+gender) ? 0 : +gender
+        return genderInt % 2
+    }
 }
 
-export default {
-    getList,
-    insert,
-    update,
-    deleteOne,
-    findUserByName
-}
+export default User

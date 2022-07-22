@@ -5,7 +5,7 @@
  * Description: 视图层: 视图的内核, 模型就是指视图的数据
 *******************************************************************************/
 
- class AjaxResult {
+class AjaxResult {
     constructor(data) {
         this.status = 200
         this.data = data
@@ -44,6 +44,16 @@
         this.msg = msg
         return this
     }
+}
+
+AjaxResult.error = (msg) => {
+    return new AjaxResult().setStatus(500).setMsg(msg)
+}
+
+AjaxResult.success = (data, msg = '请求成功') => {
+    const result = new AjaxResult()
+    data && result.setData(data)
+    return result.setMsg(msg)
 }
 
 export default AjaxResult

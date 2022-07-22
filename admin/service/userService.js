@@ -4,74 +4,56 @@
  * CreateTime: 2022-07-22 10:30:36
  * Description: 用户业务模块
 *************************************************************/
-import UserDao from '../dao/userDao.js'
 import AjaxResult from '../model/ajaxResult.js'
+import UserDao from '../dao/userDao.js'
 
 class UserService {
-    async getUserList(req) {
-        const result = await UserDao.getUserList(req.query)
+    async getUserList(query) {
+        const result = await UserDao.getUserList(query)
         if (result.sqlMessage) {
-            return new AjaxResult().set500(result.sqlMessage)
+            return AjaxResult.error(result.sqlMessage)
         }
-        return new AjaxResult(result)
+        return AjaxResult.success(result)
     }
 
-    async addUser(req) {
-        const { body } = req
-        const { error, params } = checkParams(body)
-        if (error) {
-            return new AjaxResult().set500(error)
-        }
-        const hasUser = await checkIsExist(params)
+    async addUser(userModel) {
+        const hasUser = await checkIsExist(userModel)
         if (hasUser) {
-            return new AjaxResult().set500('用户账号重名')
+            return AjaxResult.error('用户账号重名')
         }
-        const result = await UserDao.addUser(params)
+        userModel.gender = userModel.formatGender()
+        const result = await UserDao.addUser(userModel)
         if (result.sqlMessage) {
-            return new AjaxResult().set500(result.sqlMessage)
+            return AjaxResult.error(result.sqlMessage)
         }
-        return new AjaxResult(result.insertId)
+        return AjaxResult.success(result.insertId)
     }
 
-    async updateUser(req) {
-        const { body } = req
-        if (!body.userId) {
-            return new AjaxResult().set500('参数错误')
+    async updateUser(userModel) {
+        const hasUser = await checkIsExist(userModel)
+        if (hasUser) {
+            return AjaxResult.error('用户账号重名')
         }
-        const { sqlMessage } = await UserDao.updateUser(body)
+        const { gender } = userModel
+        if (gender) {
+            userModel.gender = userModel.formatGender()
+        }
+        const { sqlMessage } = await UserDao.updateUser(userModel)
         if (sqlMessage) {
-            return new AjaxResult().set500(sqlMessage)
+            return AjaxResult.error(sqlMessage)
         }
-        return new AjaxResult().setMsg('更新用户成功')
+        return AjaxResult.success(null, '更新用户成功')
     }
 
-    async deleteUser(req) {
-        const { params } = req
-        const { id = 0 } = params
-        if (!id) {
-            return new AjaxResult().set500('userId未传入')
-        }
-        await UserDao.deleteUser(id)
-        return new AjaxResult().setMsg('删除成功')
+    async deleteUser(userId) {
+        await UserDao.deleteUser(userId)
+        return AjaxResult.success(null, '删除成功')
     }
 }
 
-function checkParams(params) {
-    const result = { error: '', params: null }
-    let { userName, password, gender } = params
-    if (!userName) {
-        result.error = '用户名不可为空'
-    } else if (!password) {
-        result.error = '密码不可为空'
-    }
-    gender = isNaN(+gender) ? 0 : ((+gender) % 2)
-    result.params = Object.assign({}, params, { gender })
-    return result
-}
-
-async function checkIsExist(params) {
-    const { userName } = params
-    const list = await UserDao.findUserByName(userName)
+async function checkIsExist(userModel) {
+    const { userId, userName } = userModel
+    const list = await UserDao.findUserByName(userId, userName)
     return list.length
 }
 
